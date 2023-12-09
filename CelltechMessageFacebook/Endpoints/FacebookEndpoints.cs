@@ -26,27 +26,16 @@ public static class FacebookEndpoints
             return Results.Ok(result);
         });
 
-        group.MapPost("hook", () =>
+        group.MapPost("hook", ([FromBody] object payload) =>
         {
-
+            ;
         });
         
         // hook - end
 
-        group.MapGet("pages", async ([FromServices] IFacebookService facebookService, [FromQuery] Guid userId) =>
+        group.MapGet("pages", async ([FromServices] IFacebookService facebookService, [FromQuery] string accessToken) =>
         {
-            var user = DataManager.Users.GetValueOrDefault(userId);
-            if (user is null)
-            {
-                return Results.BadRequest("UserId not exist");
-            }
-
-            if (string.IsNullOrEmpty(user.AccountAccessToken))
-            {
-                return Results.BadRequest("UserId not connected to Facebook");
-            }
-
-            var pages = await facebookService.GetPages(user.AccountAccessToken);
+            var pages = await facebookService.GetPages(accessToken);
             return Results.Ok(pages);
         });
     }

@@ -6,12 +6,12 @@ import {Observable} from "rxjs";
 export class FacebookService{
   constructor(private httpClient: HttpClient) {}
 
-  public getPages(userId: string) : Observable<any> {
+  public getPages(accessToken: string) : Observable<any> {
     const params = new HttpParams({
       fromObject: {
-        userId
+        accessToken
       },
     });
-    return this.httpClient.get<any>('https://localhost:7279/facebook/pages', { params });
+    return this.httpClient.get<any>('https://localhost:7297/facebook/pages', { params });
   }
 }

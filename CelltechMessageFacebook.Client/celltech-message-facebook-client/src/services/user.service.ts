@@ -7,10 +7,6 @@ export class UserService{
   constructor(private httpClient: HttpClient) {}
 
   public signUp(payload: any) : Observable<any> {
-    return this.httpClient.post<any>('https://localhost:7279/user/signUp', payload);
-  }
-
-  public setUp(payload: any) : Observable<any> {
-    return this.httpClient.post<any>('https://localhost:7279/user/setUp', payload);
+    return this.httpClient.post<any>('https://localhost:7297/user/signUp', payload);
   }
 }

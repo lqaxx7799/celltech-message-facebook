@@ -29,16 +29,19 @@ public static class UserEndpoints
                 CreatedAt = DateTimeOffset.Now
             };
             DataManager.Users[user.Id] = user;
-            // foreach (var pageRequest in request.Pages)
-            // {
-            //     var page = new FacebookPage
-            //     {
-            //         Name = pageRequest.PageName,
-            //         PageId = pageRequest.PageId,
-            //         UserId = user.Id
-            //     };
-            //     DataManager.FacebookPages[page.Id] = page;
-            // }
+            foreach (var pageRequest in request.Pages)
+            {
+                await facebookService.SubscribeApp(pageRequest.PageId, pageRequest.AccessToken);
+                var page = new FacebookPage
+                {
+                    Name = pageRequest.PageName,
+                    PageId = pageRequest.PageId,
+                    UserId = user.Id,
+                    AccessToken = pageRequest.AccessToken,
+                    CreatedAt = DateTimeOffset.Now
+                };
+                DataManager.FacebookPages[page.Id] = page;
+            }
             return Results.Ok(user);
         });
     }

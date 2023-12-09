@@ -1,8 +1,16 @@
 import {AfterViewInit, Component, OnInit} from '@angular/core';
-import {FormGroup, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators} from "@angular/forms";
+import {
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  UntypedFormBuilder,
+  UntypedFormGroup,
+  Validators
+} from "@angular/forms";
 import {CommonModule, NgIf} from "@angular/common";
 import {UserService} from "../../services/user.service";
 import {FacebookService} from "../../services/facebook.service";
+import {Router} from "@angular/router";
 
 declare global {
   interface Window { FB: any; }
@@ -16,6 +24,7 @@ declare global {
   imports: [
     ReactiveFormsModule,
     CommonModule,
+    FormsModule,
   ]
 })
 export class FeatureStartUpComponent implements OnInit, AfterViewInit {
@@ -24,11 +33,13 @@ export class FeatureStartUpComponent implements OnInit, AfterViewInit {
   form: UntypedFormGroup;
 
   facebookPages: any[] = [];
+  selectedFacebookPageIds: string[] = [];
 
   constructor(
     private readonly formBuilder: UntypedFormBuilder,
     private readonly userService: UserService,
-    private readonly facebookService: FacebookService
+    private readonly facebookService: FacebookService,
+    private readonly router: Router
   ) {}
 
   ngOnInit() {
@@ -50,7 +61,26 @@ export class FeatureStartUpComponent implements OnInit, AfterViewInit {
       console.log(11111, response);
       this.facebookAuthResponse = response;
       this.isFacebookConnected = true;
+      this.facebookService.getPages(response.authResponse.accessToken)
+        .subscribe({
+          next: (pages) => {
+            console.log(11111, pages);
+            this.facebookPages = pages.data;
+          },
+        });
     }, { scope: 'pages_show_list,pages_manage_metadata,pages_messaging,pages_read_engagement' });
+  }
+
+  public isPageSelected(pageId: any) {
+    return this.selectedFacebookPageIds.includes(pageId);
+  }
+
+  public onChangePage(pageId: any, event: boolean) {
+    if (event) {
+      this.selectedFacebookPageIds = [...this.selectedFacebookPageIds, pageId];
+    } else {
+      this.selectedFacebookPageIds = this.selectedFacebookPageIds.filter(x => x !== pageId);
+    }
   }
 
   public onSubmit() {
@@ -61,16 +91,19 @@ export class FeatureStartUpComponent implements OnInit, AfterViewInit {
     this.userService.signUp({
       ...this.form.value,
       authResponse: this.facebookAuthResponse.authResponse,
+      pages: this.selectedFacebookPageIds.map(pageId => {
+        const page = this.facebookPages.find(page => page.id === pageId);
+        return {
+          pageName: page.name,
+          pageId: page.id,
+          accessToken: page.accessToken,
+        };
+      })
     })
       .subscribe({
         next: (user) => {
           localStorage.setItem('currentUser', user);
-          this.facebookService.getPages(user.id)
-            .subscribe({
-              next: (pages) => {
-                this.facebookPages = pages;
-              },
-            });
+          this.router.navigate(['/inbox']).then();
         },
       });
   }

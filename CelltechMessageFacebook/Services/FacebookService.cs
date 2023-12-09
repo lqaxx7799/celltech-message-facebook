@@ -65,7 +65,7 @@ public class FacebookService(IHttpClientFactory httpClientFactory, AppSettings a
         var httpClient = httpClientFactory.CreateClient();
         var builder = new UriBuilder($"{appSettings.Facebook.BaseApiUrl}/{pageId}/subscribed_apps");
         var query = HttpUtility.ParseQueryString(builder.Query);
-        query["subscribed_fields"] = "leadgen";
+        query["subscribed_fields"] = "messages";
         builder.Query = query.ToString();
         var url = builder.ToString();
         var requestMessage = new HttpRequestMessage(HttpMethod.Post, url);

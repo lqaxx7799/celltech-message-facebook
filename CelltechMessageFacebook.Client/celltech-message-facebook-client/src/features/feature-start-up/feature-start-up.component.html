@@ -2,20 +2,42 @@
   <div>
     <div>
       <label for="userName" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">User name</label>
-      <input type="text" id="userName" formControlName="userName" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="John" required>
+      <input type="text" id="userName" formControlName="userName" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="User name" required>
     </div>
-    <div>
-      <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">User name</label>
-      <input type="text" id="email" formControlName="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="John" required>
+    <div class="mt-2">
+      <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
+      <input type="text" id="email" formControlName="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Email" required>
     </div>
   </div>
-  <div *ngIf="!isFacebookConnected">
+  <div *ngIf="!isFacebookConnected" class="mt-2">
     <button
       class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
       (click)="connectFacebook()"
     >
       Connect Facebook
     </button>
+  </div>
+  <div *ngIf="isFacebookConnected" class="mt-2">
+    <div>
+      <table>
+        <tr>
+          <th></th>
+          <th>Page Id</th>
+          <th>Page Name</th>
+        </tr>
+        <tr *ngFor="let facebookPage of facebookPages">
+          <td>
+            <input
+              type="checkbox"
+              [ngModelOptions]="{ standalone: true }"
+              [ngModel]="isPageSelected(facebookPage.id)"
+              (ngModelChange)="onChangePage(facebookPage.id, $event)" />
+          </td>
+          <td>{{ facebookPage.id }}</td>
+          <td>{{ facebookPage.name }}</td>
+        </tr>
+      </table>
+    </div>
   </div>
   <div class="mt-2">
     <button
