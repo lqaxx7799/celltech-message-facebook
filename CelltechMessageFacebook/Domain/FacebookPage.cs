@@ -1,8 +1,7 @@
 namespace CelltechMessageFacebook.Domain;
 
-public class FacebookPage
+public class FacebookPage : BaseEntity
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
     public string Name { get; set; } = default!;
     public Guid UserId { get; set; }
     public string? AccessToken { get; set; }

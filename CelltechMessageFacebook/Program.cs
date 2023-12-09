@@ -22,7 +22,7 @@ services.AddScoped<IFacebookService, FacebookService>();
 var app = builder.Build();
 app.UseCors("AllowAllOrigins");
 app.AddMessageEndpoints();
-app.AddHookEndpoints();
+app.AddFacebookEndpoints();
 app.AddUserEndpoints();
 
 app.Run();

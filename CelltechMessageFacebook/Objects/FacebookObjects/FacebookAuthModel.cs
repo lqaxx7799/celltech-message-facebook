@@ -16,5 +16,6 @@ public class FacebookAuthResponse
     public long ExpiresIn { get; set; }
     public string GraphDomain { get; set; } = default!;
     public string SignedRequest { get; set; } = default!;
+    [JsonProperty("userID")]
     public string UserId { get; set; } = default!;
 }

@@ -1,10 +1,8 @@
 namespace CelltechMessageFacebook.Domain;
 
-public class Conversation
+public class Conversation : BaseEntity
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
     public List<Guid> UserIds { get; set; } = default!;
-    public DateTimeOffset CreatedAt { get; set; }
     public Guid CustomerId { get; set; }
     public Guid FacebookPageId { get; set; }
 }
