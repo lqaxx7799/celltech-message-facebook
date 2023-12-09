@@ -1,6 +1,14 @@
-var builder = WebApplication.CreateBuilder(args);
-var app = builder.Build();
+using CelltechMessageFacebook.Endpoints;
+using CelltechMessageFacebook.Objects;
 
-app.MapGet("/", () => "Hello World!");
+var builder = WebApplication.CreateBuilder(args);
+var services = builder.Services;
+var appSettings = builder.Configuration.Get<AppSettings>();
+services.AddSingleton(appSettings!);
+
+var app = builder.Build();
+app.AddMessageEndpoints();
+app.AddHookEndpoints();
+app.AddUserEndpoints();
 
 app.Run();

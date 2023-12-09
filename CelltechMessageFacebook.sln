@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CelltechMessageFacebook", "CelltechMessageFacebook\CelltechMessageFacebook.csproj", "{AA9E3427-D58C-420B-B9EF-046F1A572E9F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CelltechMessageFacebook.Client", "CelltechMessageFacebook.Client\CelltechMessageFacebook.Client.csproj", "{9AE894B8-7969-4E40-A7A6-0CF4A9F9D847}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{AA9E3427-D58C-420B-B9EF-046F1A572E9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AA9E3427-D58C-420B-B9EF-046F1A572E9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AA9E3427-D58C-420B-B9EF-046F1A572E9F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9AE894B8-7969-4E40-A7A6-0CF4A9F9D847}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AE894B8-7969-4E40-A7A6-0CF4A9F9D847}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AE894B8-7969-4E40-A7A6-0CF4A9F9D847}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AE894B8-7969-4E40-A7A6-0CF4A9F9D847}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
