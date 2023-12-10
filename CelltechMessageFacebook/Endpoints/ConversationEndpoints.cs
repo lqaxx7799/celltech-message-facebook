@@ -15,5 +15,12 @@ public static class ConversationEndpoints
                 .ToList();
             return Results.Ok(conversations);
         });
+        
+        group.MapGet("get", ([AsParameters] ConversationGetRequest request) =>
+        {
+            var conversation = DataManager.Conversations.Values
+                .FirstOrDefault(x => x.Id == request.Id);
+            return Results.Ok(conversation);
+        });
     }
 }

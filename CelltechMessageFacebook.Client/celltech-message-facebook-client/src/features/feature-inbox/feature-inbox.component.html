@@ -1,1 +1,15 @@
-inbox
+<div class="grid grid-cols-[1fr_6fr]">
+  <div>
+    <div *ngFor="let conversation of conversations">
+      <div [routerLink]="['/inbox/' + conversationId]">
+        {{ conversation.id }}
+      </div>
+    </div>
+  </div>
+  <div>
+    <div *ngIf="!conversationId">
+      Please select a conversation!
+    </div>
+    <app-chat *ngIf="conversationId"></app-chat>
+  </div>
+</div>

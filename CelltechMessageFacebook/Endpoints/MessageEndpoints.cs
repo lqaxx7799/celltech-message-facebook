@@ -1,6 +1,7 @@
 ﻿using CelltechMessageFacebook.Domain;
 using CelltechMessageFacebook.Managers;
 using CelltechMessageFacebook.Objects;
+using CelltechMessageFacebook.Objects.FacebookObjects;
 using CelltechMessageFacebook.Objects.RequestObjects;
 using CelltechMessageFacebook.Objects.ResponseObjects;
 using CelltechMessageFacebook.Services;
@@ -39,7 +40,7 @@ public static class MessageEndpoints
             return Results.Ok(messages);
         });
 
-        group.MapPost("reply", (
+        group.MapPost("reply", async (
             [FromServices] IFacebookService facebookService,
             [FromBody] MessageReplyRequest request) =>
         {
@@ -56,9 +57,41 @@ public static class MessageEndpoints
                 MessageId = message.Id,
                 CreatedAt = DateTimeOffset.Now
             };
+
+            var conversation = DataManager.Conversations.Values.FirstOrDefault(x => x.Id == request.ConversationId);
+            var senderPage =
+                DataManager.FacebookPages.Values.FirstOrDefault(x => x.Id == conversation?.FacebookPageId);
+            var recipientUser = DataManager.Users.Values.FirstOrDefault(x => x.Id == conversation?.CustomerId && x.Type == UserType.Customer);
+            var messageRequest = new FacebookSendMessageRequest
+            {
+                Recipient = new FacebookSendMessageRecipientRequest
+                {
+                    Id = recipientUser?.FacebookAccountId!,
+                },
+                Message = new FacebookSendMessageMessageRequest
+                {
+                    Text = request.Content
+                },
+                MessageType = "RESPONSE"
+            };
+            var facebookMessageResponse = await facebookService.SendMessage(messageRequest, senderPage?.PageId!, senderPage?.AccessToken!);
+            message.FacebookMessageId = facebookMessageResponse.MessageId;
+
             DataManager.Messages[message.Id] = message;
             DataManager.MessageBlocks[messageBlock.Id] = messageBlock;
-            return Results.Ok(message);
+
+            var messageResponse = new MessageResponse
+            {
+                Id = message.Id,
+                CreatedAt = message.CreatedAt,
+                ConversationId = message.ConversationId,
+                SenderId = message.SenderId,
+                CreatedBy = message.CreatedBy,
+                ModifiedAt = message.ModifiedAt,
+                ModifiedBy = message.ModifiedBy,
+                MessageBlocks = new List<MessageBlock> { messageBlock }
+            };
+            return Results.Ok(messageResponse);
         });
     }
 }

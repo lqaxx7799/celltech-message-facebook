@@ -6,32 +6,25 @@ public class FacebookHookEntry
 {
     public string Id { get; set; } = default!;
     public long Time { get; set; }
-    public List<FacebookHookChange> Changes { get; set; } = default!;
+    public List<FacebookHookMessaging> Messaging { get; set; } = default!;
 }
 
-public class FacebookHookChange
+public class FacebookHookMessaging
 {
-    public FacebookHookValue Value { get; set; } = default!;
-    public string Field { get; set; } = default!;
+    public FacebookHookMessageUser Sender { get; set; } = default!;
+    public FacebookHookMessageUser Recipient { get; set; } = default!;
+    public long Timestamp { get; set; }
+    public FacebookHookMessage Message { get; set; } = default!;
 }
 
-public class FacebookHookValue
+public class FacebookHookMessageUser
 {
-    [JsonProperty("ad_id")]
-    public string? AdId { get; set; }
-    
-    [JsonProperty("form_id")]
-    public string? FormId { get; set; }
-    
-    [JsonProperty("leadgen_id")]
-    public string? LeadgenId { get; set; }
-    
-    [JsonProperty("created_time")]
-    public long CreatedTime { get; set; }
-    
-    [JsonProperty("page_id")]
-    public string? PageId { get; set; }
-    
-    [JsonProperty("adgroup_id")]
-    public string? AdgroupId { get; set; }
+    public string Id { get; set; } = default!;
+}
+
+public class FacebookHookMessage
+{
+    public string Mid { get; set; } = default!;
+
+    public string Text { get; set; } = default!;
 }

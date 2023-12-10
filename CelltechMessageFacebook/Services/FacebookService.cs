@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Headers;
+using System.Text;
 using System.Web;
 using CelltechMessageFacebook.Objects;
 using CelltechMessageFacebook.Objects.FacebookObjects;
@@ -14,6 +15,7 @@ public interface IFacebookService
     Task<FacebookOAuthResponse> GenerateLongLivedToken(string accessToken);
     Task<T> GetNode<T>(string nodeId, string accessToken);
     Task<T> GetNode<T>(string nodeId, string accessToken, string? fields);
+    Task<FacebookSendMessageResponse> SendMessage(FacebookSendMessageRequest payload, string pageId, string accessToken);
 }
 
 public class FacebookService(IHttpClientFactory httpClientFactory, AppSettings appSettings, ILogger<FacebookService> logger) : IFacebookService
@@ -129,5 +131,24 @@ public class FacebookService(IHttpClientFactory httpClientFactory, AppSettings a
         }
 
         return JsonConvert.DeserializeObject<T>(leadContent)!;
+    }
+
+    public async Task<FacebookSendMessageResponse> SendMessage(FacebookSendMessageRequest payload, string pageId, string accessToken)
+    {
+        var httpClient = httpClientFactory.CreateClient();
+        var builder = new UriBuilder($"{appSettings.Facebook.BaseApiUrl}/{pageId}/messages");
+        var url = builder.ToString();
+        var requestMessage = new HttpRequestMessage(HttpMethod.Post, url);
+        requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+        var json = JsonConvert.SerializeObject(payload);
+        requestMessage.Content = new StringContent(json, Encoding.UTF8, "application/json");
+        var response = await httpClient.SendAsync(requestMessage);
+        var content = await response.Content.ReadAsStringAsync();
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorMessage = JsonConvert.DeserializeObject<FacebookErrorModel>(content)!.Error.Message;
+            throw new BadHttpRequestException(errorMessage ?? string.Empty);
+        }
+        return JsonConvert.DeserializeObject<FacebookSendMessageResponse>(content)!;
     }
 }

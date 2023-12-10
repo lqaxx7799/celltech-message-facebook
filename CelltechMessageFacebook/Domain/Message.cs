@@ -4,4 +4,5 @@ public class Message : BaseEntity
 {
     public Guid SenderId { get; set; }
     public Guid ConversationId { get; set; }
+    public string? FacebookMessageId { get; set; }
 }

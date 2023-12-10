@@ -8,7 +8,7 @@ public class User : BaseEntity
     public string? FacebookAccountId { get; set; }
     public string? AccountAccessToken { get; set; }
     public bool IsFacebookConnected { get; set; }
-    
+    public Guid? UserOwnerId { get; set; }
 }
 
 public enum UserType

@@ -1,5 +1,8 @@
+using CelltechMessageFacebook.Domain;
 using CelltechMessageFacebook.Managers;
 using CelltechMessageFacebook.Objects;
+using CelltechMessageFacebook.Objects.FacebookObjects;
+using CelltechMessageFacebook.Objects.RequestObjects;
 using CelltechMessageFacebook.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,9 +29,147 @@ public static class FacebookEndpoints
             return Results.Ok(result);
         });
 
-        group.MapPost("hook", ([FromBody] object payload) =>
+        group.MapPost("hook", async (
+            [FromServices] IFacebookService facebookService,
+            [FromBody] FacebookHookRequest request) =>
         {
-            ;
+            foreach (var entry in request.Entry)
+            {
+                foreach (var messaging in entry.Messaging)
+                {
+                    var isPageSender = entry.Id == messaging.Sender.Id;
+                    if (isPageSender)
+                    {
+                        var senders = DataManager.FacebookPages.Values.Where(x => x.PageId == messaging.Sender.Id).ToList();
+                        foreach (var senderPage in senders)
+                        {
+                            var senderUser = DataManager.Users.Values.FirstOrDefault(x =>
+                                x.Id == senderPage.UserId && x.Type == UserType.Agent);
+                            if (senderUser is null)
+                            {
+                                continue;
+                            }
+
+                            var recipientUser = DataManager.Users.Values.FirstOrDefault(x =>
+                                x.FacebookAccountId == messaging.Recipient.Id && x.Type == UserType.Customer &&
+                                x.UserOwnerId == senderUser.Id);
+                            // create new customer user if not exist
+                            if (recipientUser is null)
+                            {
+                                var recipientFacebookUser =
+                                    await facebookService.GetNode<FacebookAccountResponse>(messaging.Recipient.Id, senderPage.AccessToken!);
+                                recipientUser = new User
+                                {
+                                    CreatedAt = DateTimeOffset.Now,
+                                    FacebookAccountId = messaging.Recipient.Id,
+                                    Type = UserType.Customer,
+                                    UserName = recipientFacebookUser.FirstName + " " + recipientFacebookUser.LastName,
+                                    UserOwnerId = senderUser.Id,
+                                };
+                                DataManager.Users[recipientUser.Id] = recipientUser;
+                            }
+
+                            var conversation = DataManager.Conversations.Values.FirstOrDefault(x =>
+                                x.UserIds.Contains(recipientUser.Id) && x.UserIds.Contains(senderUser.Id));
+                            if (conversation is null)
+                            {
+                                conversation = new Conversation
+                                {
+                                    CreatedAt = DateTimeOffset.Now,
+                                    CustomerId = recipientUser.Id,
+                                    FacebookPageId = senderPage.Id,
+                                    UserIds = new List<Guid> { recipientUser.Id, senderUser.Id }
+                                };
+                                DataManager.Conversations[conversation.Id] = conversation;
+                            }
+                            var message = new Message
+                            {
+                                CreatedAt = DateTimeOffset.Now,
+                                SenderId = senderUser.Id,
+                                ConversationId = conversation.Id,
+                                FacebookMessageId = messaging.Message.Mid
+                            };
+                            var messageBlock = new MessageBlock
+                            {
+                                Content = messaging.Message.Text,
+                                ContentType = "text/html",
+                                MessageId = message.Id,
+                                CreatedAt = DateTimeOffset.Now
+                            };
+                            DataManager.Messages[message.Id] = message;
+                            DataManager.MessageBlocks[messageBlock.Id] = messageBlock;
+                            
+                            // TODO: send signalR
+                        }
+                    }
+                    else
+                    {
+                        var recipients = DataManager.FacebookPages.Values.Where(x => x.PageId == messaging.Recipient.Id).ToList();
+                        foreach (var recipientPage in recipients)
+                        {
+                            var recipientUser = DataManager.Users.Values.FirstOrDefault(x =>
+                                x.Id == recipientPage.UserId && x.Type == UserType.Agent);
+                            if (recipientUser is null)
+                            {
+                                continue;
+                            }
+
+                            var senderUser = DataManager.Users.Values.FirstOrDefault(x =>
+                                x.FacebookAccountId == messaging.Recipient.Id && x.Type == UserType.Customer &&
+                                x.UserOwnerId == recipientUser.Id);
+                            // create new customer user if not exist
+                            if (senderUser is null)
+                            {
+                                var recipientFacebookUser =
+                                    await facebookService.GetNode<FacebookAccountResponse>(messaging.Recipient.Id, recipientPage.AccessToken!);
+                                senderUser = new User
+                                {
+                                    CreatedAt = DateTimeOffset.Now,
+                                    FacebookAccountId = messaging.Recipient.Id,
+                                    Type = UserType.Customer,
+                                    UserName = recipientFacebookUser.FirstName + " " + recipientFacebookUser.LastName,
+                                    UserOwnerId = recipientUser.Id,
+                                };
+                                DataManager.Users[senderUser.Id] = senderUser;
+                            }
+
+                            var conversation = DataManager.Conversations.Values.FirstOrDefault(x =>
+                                x.UserIds.Contains(recipientUser.Id) && x.UserIds.Contains(senderUser.Id));
+                            if (conversation is null)
+                            {
+                                conversation = new Conversation
+                                {
+                                    CreatedAt = DateTimeOffset.Now,
+                                    CustomerId = senderUser.Id,
+                                    FacebookPageId = recipientPage.Id,
+                                    UserIds = new List<Guid> { recipientUser.Id, senderUser.Id }
+                                };
+                                DataManager.Conversations[conversation.Id] = conversation;
+                            }
+                            var message = new Message
+                            {
+                                CreatedAt = DateTimeOffset.Now,
+                                SenderId = senderUser.Id,
+                                ConversationId = conversation.Id,
+                                FacebookMessageId = messaging.Message.Mid
+                            };
+                            var messageBlock = new MessageBlock
+                            {
+                                Content = messaging.Message.Text,
+                                ContentType = "text/html",
+                                MessageId = message.Id,
+                                CreatedAt = DateTimeOffset.Now
+                            };
+                            DataManager.Messages[message.Id] = message;
+                            DataManager.MessageBlocks[messageBlock.Id] = messageBlock;
+                            
+                            // TODO: send signalR
+                        }
+                    }
+                }
+            }
+
+            return Results.Ok();
         });
         
         // hook - end
