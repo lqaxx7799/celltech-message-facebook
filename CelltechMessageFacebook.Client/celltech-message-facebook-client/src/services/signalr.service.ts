@@ -7,9 +7,9 @@ export class SignalrService {
   public newMessage$ = new BehaviorSubject<any>(null);
 
   private hubConnection: signalR.HubConnection;
-  public startConnection = () => {
+  public startConnection = (userId: string) => {
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl('https://localhost:7297/hub')
+      .withUrl('https://localhost:7297/hub?userId=' + userId)
       .build();
     this.hubConnection
       .start()

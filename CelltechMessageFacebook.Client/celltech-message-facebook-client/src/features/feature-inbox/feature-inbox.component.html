@@ -1,7 +1,7 @@
 <div class="grid grid-cols-[1fr_6fr]">
   <div>
     <div *ngFor="let conversation of conversations">
-      <div [routerLink]="['/inbox/' + conversationId]">
+      <div [routerLink]="['/inbox/' + conversation.id]">
         {{ conversation.id }}
       </div>
     </div>
@@ -10,6 +10,6 @@
     <div *ngIf="!conversationId">
       Please select a conversation!
     </div>
-    <app-chat *ngIf="conversationId"></app-chat>
+    <app-chat *ngIf="conversationId" [conversationId]="conversationId"></app-chat>
   </div>
 </div>

@@ -19,11 +19,15 @@ export class ChatComponent implements OnInit, OnDestroy {
   messages: any[] = [];
   chatMessage = '';
   currentUser: any | null = null;
+  page = 1;
+  pageSize = 50;
 
   @Input() set conversationId(value: string) {
     this._conversationId = value;
     this.messageService.list({
-      conversationId: value
+      conversationId: value,
+      page: this.page,
+      pageSize: this.pageSize
     })
       .subscribe({
         next: (messages) => {
@@ -45,6 +49,10 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.signalrService.newMessage$.pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (message) => {
+          if (!message) {
+            return;
+          }
+          console.log(11111111, message);
           if (message.conversationId === this._conversationId) {
             this.messages = [...this.messages, message];
           }

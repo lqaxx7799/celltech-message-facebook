@@ -3,6 +3,7 @@ import {ConversationService} from "../../services/conversation.service";
 import {ChatComponent} from "./components/chat/chat.component";
 import {ActivatedRoute, Router, RouterLink} from "@angular/router";
 import {NgFor, NgIf} from "@angular/common";
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-feature-inbox',

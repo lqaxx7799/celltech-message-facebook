@@ -8,7 +8,12 @@ export const routes: Routes = [
     component: FeatureStartUpComponent,
   },
   {
+    path: 'inbox/:conversationId',
+    component: FeatureInboxComponent,
+  },
+  {
     path: 'inbox',
     component: FeatureInboxComponent,
   },
+
 ];

@@ -103,6 +103,7 @@ export class FeatureStartUpComponent implements OnInit, AfterViewInit {
       .subscribe({
         next: (user) => {
           localStorage.setItem('currentUser', JSON.stringify(user));
+          this.userService.currentUser$.next(user);
           this.router.navigate(['inbox']).then();
         },
       });

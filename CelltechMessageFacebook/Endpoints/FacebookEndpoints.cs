@@ -4,6 +4,7 @@ using CelltechMessageFacebook.Managers;
 using CelltechMessageFacebook.Objects;
 using CelltechMessageFacebook.Objects.FacebookObjects;
 using CelltechMessageFacebook.Objects.RequestObjects;
+using CelltechMessageFacebook.Objects.ResponseObjects;
 using CelltechMessageFacebook.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -101,10 +102,22 @@ public static class FacebookEndpoints
                             };
                             DataManager.Messages[message.Id] = message;
                             DataManager.MessageBlocks[messageBlock.Id] = messageBlock;
-                            
+                            var messageResponse = new MessageResponse
+                            {
+                                Id = message.Id,
+                                CreatedAt = message.CreatedAt,
+                                ConversationId = message.ConversationId,
+                                SenderId = message.SenderId,
+                                CreatedBy = message.CreatedBy,
+                                ModifiedAt = message.ModifiedAt,
+                                ModifiedBy = message.ModifiedBy,
+                                MessageBlocks = new List<MessageBlock> { messageBlock }
+                            };
                             // TODO: send signalR
-                            await chatHubContext.Clients.Users(senderUser.Id.ToString())
-                                .SendAsync("messageReceived", message);
+                            var connectionId = ChatHub.ConnectionMappings.GetValueOrDefault(senderUser.Id.ToString());
+                            if (connectionId is not null) {
+                                await chatHubContext.Clients.Client(connectionId).SendAsync("messageReceived", messageResponse);
+                            }
                         }
                     }
                     else
@@ -167,10 +180,23 @@ public static class FacebookEndpoints
                             };
                             DataManager.Messages[message.Id] = message;
                             DataManager.MessageBlocks[messageBlock.Id] = messageBlock;
-                            
+                            var messageResponse = new MessageResponse
+                            {
+                                Id = message.Id,
+                                CreatedAt = message.CreatedAt,
+                                ConversationId = message.ConversationId,
+                                SenderId = message.SenderId,
+                                CreatedBy = message.CreatedBy,
+                                ModifiedAt = message.ModifiedAt,
+                                ModifiedBy = message.ModifiedBy,
+                                MessageBlocks = new List<MessageBlock> { messageBlock }
+                            };
+
                             // TODO: send signalR
-                            await chatHubContext.Clients.Users(recipientUser.Id.ToString())
-                                .SendAsync("messageReceived", message);
+                            var connectionId = ChatHub.ConnectionMappings.GetValueOrDefault(recipientUser.Id.ToString());
+                            if (connectionId is not null) {
+                                await chatHubContext.Clients.Client(connectionId).SendAsync("messageReceived", messageResponse);
+                            }
                         }
                     }
                 }
