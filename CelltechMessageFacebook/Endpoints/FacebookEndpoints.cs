@@ -1,10 +1,12 @@
 using CelltechMessageFacebook.Domain;
+using CelltechMessageFacebook.Hubs;
 using CelltechMessageFacebook.Managers;
 using CelltechMessageFacebook.Objects;
 using CelltechMessageFacebook.Objects.FacebookObjects;
 using CelltechMessageFacebook.Objects.RequestObjects;
 using CelltechMessageFacebook.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace CelltechMessageFacebook.Endpoints;
 
@@ -31,6 +33,7 @@ public static class FacebookEndpoints
 
         group.MapPost("hook", async (
             [FromServices] IFacebookService facebookService,
+            [FromServices] IHubContext<ChatHub> chatHubContext,
             [FromBody] FacebookHookRequest request) =>
         {
             foreach (var entry in request.Entry)
@@ -100,6 +103,8 @@ public static class FacebookEndpoints
                             DataManager.MessageBlocks[messageBlock.Id] = messageBlock;
                             
                             // TODO: send signalR
+                            await chatHubContext.Clients.Users(senderUser.Id.ToString())
+                                .SendAsync("messageReceived", message);
                         }
                     }
                     else
@@ -164,6 +169,8 @@ public static class FacebookEndpoints
                             DataManager.MessageBlocks[messageBlock.Id] = messageBlock;
                             
                             // TODO: send signalR
+                            await chatHubContext.Clients.Users(recipientUser.Id.ToString())
+                                .SendAsync("messageReceived", message);
                         }
                     }
                 }

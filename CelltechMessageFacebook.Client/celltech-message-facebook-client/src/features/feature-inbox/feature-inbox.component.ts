@@ -27,6 +27,14 @@ export class FeatureInboxComponent implements OnInit {
     if (!this.currentUser) {
       return;
     }
+    this.activatedRoute.paramMap.subscribe(p => {
+      const newConversationId = p.get('conversationId');
+
+      if (this.conversationId !== newConversationId) {
+        this.conversationId = newConversationId;
+      }
+    });
+
     this.conversationService.list({ userId: this.currentUser.id })
       .subscribe({
         next: (conversations) => {

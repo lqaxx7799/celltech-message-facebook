@@ -1,4 +1,5 @@
 using CelltechMessageFacebook.Endpoints;
+using CelltechMessageFacebook.Hubs;
 using CelltechMessageFacebook.Objects;
 using CelltechMessageFacebook.Services;
 
@@ -16,6 +17,7 @@ services.AddCors(options =>
         .SetIsOriginAllowed(_ => true));
 });
 
+services.AddSignalR();
 services.AddHttpClient();
 services.AddScoped<IFacebookService, FacebookService>();
 
@@ -24,5 +26,7 @@ app.UseCors("AllowAllOrigins");
 app.AddMessageEndpoints();
 app.AddFacebookEndpoints();
 app.AddUserEndpoints();
+
+app.MapHub<ChatHub>("/hub");
 
 app.Run();

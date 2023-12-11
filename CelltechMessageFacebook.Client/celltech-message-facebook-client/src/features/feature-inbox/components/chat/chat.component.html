@@ -1,0 +1,10 @@
+<div>
+  <div *ngFor="let message of messages">
+    <div *ngFor="let messageBlock of message.messageBlocks">{{ messageBlock.content }}</div>
+  </div>
+
+  <div>
+    <input [(ngModel)]="chatMessage" />
+    <button (click)="sendMessage()">Send</button>
+  </div>
+</div>
