@@ -41,7 +41,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   ngOnInit() {
-    this.currentUser = localStorage.getItem('currentUser');
+    this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
     this.signalrService.newMessage$.pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (message) => {

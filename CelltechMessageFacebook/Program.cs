@@ -26,6 +26,7 @@ app.UseCors("AllowAllOrigins");
 app.AddMessageEndpoints();
 app.AddFacebookEndpoints();
 app.AddUserEndpoints();
+app.AddConversationEndpoints();
 
 app.MapHub<ChatHub>("/hub");
 

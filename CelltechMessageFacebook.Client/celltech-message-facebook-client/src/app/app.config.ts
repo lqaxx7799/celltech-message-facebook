@@ -6,6 +6,8 @@ import {provideHttpClient} from "@angular/common/http";
 import {UserService} from "../services/user.service";
 import {FacebookService} from "../services/facebook.service";
 import {SignalrService} from "../services/signalr.service";
+import {ConversationService} from "../services/conversation.service";
+import {MessageService} from "../services/message.service";
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -14,5 +16,7 @@ export const appConfig: ApplicationConfig = {
     UserService,
     FacebookService,
     SignalrService,
+    ConversationService,
+    MessageService,
   ],
 };

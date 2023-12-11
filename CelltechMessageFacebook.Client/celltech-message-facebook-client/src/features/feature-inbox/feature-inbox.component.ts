@@ -23,7 +23,7 @@ export class FeatureInboxComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.currentUser = localStorage.getItem('currentUser');
+    this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
     if (!this.currentUser) {
       return;
     }
