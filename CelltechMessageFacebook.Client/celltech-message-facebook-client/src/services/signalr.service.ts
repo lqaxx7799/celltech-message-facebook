@@ -5,6 +5,7 @@ import {BehaviorSubject} from "rxjs";
 @Injectable()
 export class SignalrService {
   public newMessage$ = new BehaviorSubject<any>(null);
+  public newConversation$ = new BehaviorSubject<any>(null);
 
   private hubConnection: signalR.HubConnection;
   public startConnection = (userId: string) => {
@@ -20,6 +21,9 @@ export class SignalrService {
   public addMessageReceivedListener = () => {
     this.hubConnection.on('messageReceived', (data) => {
       this.newMessage$.next(data);
+    });
+    this.hubConnection.on('newConversation', (data) => {
+      this.newConversation$.next(data);
     });
   }
 }

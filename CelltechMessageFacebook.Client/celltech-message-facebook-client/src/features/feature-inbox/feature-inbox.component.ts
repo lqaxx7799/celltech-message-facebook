@@ -1,9 +1,11 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ConversationService} from "../../services/conversation.service";
 import {ChatComponent} from "./components/chat/chat.component";
 import {ActivatedRoute, Router, RouterLink} from "@angular/router";
 import {NgFor, NgIf} from "@angular/common";
 import { UserService } from '../../services/user.service';
+import { SignalrService } from '../../services/signalr.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-feature-inbox',
@@ -11,16 +13,19 @@ import { UserService } from '../../services/user.service';
   standalone: true,
   imports: [ChatComponent, NgIf, NgFor, RouterLink]
 })
-export class FeatureInboxComponent implements OnInit {
+export class FeatureInboxComponent implements OnInit, OnDestroy {
   conversations: any[] = [];
   currentUser: any = null;
   conversationId: string | null = null;
   currentConversation: any = null;
 
+  private destroy$ = new Subject<void>();
+
   constructor(
     private readonly conversationService: ConversationService,
     private readonly router: Router,
     private readonly activatedRoute: ActivatedRoute,
+    private readonly signalrService: SignalrService,
   ) {}
 
   ngOnInit() {
@@ -51,5 +56,22 @@ export class FeatureInboxComponent implements OnInit {
           }
         });
     }
+    this.signalrService.newConversation$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (newConversation) => {
+          if (!newConversation) {
+            return;
+          }
+          if (this.conversations.every(item => item.id !== newConversation.id)) {
+            this.conversations = [...this.conversations, newConversation];
+          }
+        }
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

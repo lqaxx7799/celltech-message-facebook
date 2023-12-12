@@ -117,6 +117,7 @@ public static class FacebookEndpoints
                             var connectionId = ChatHub.ConnectionMappings.GetValueOrDefault(senderUser.Id.ToString());
                             if (connectionId is not null) {
                                 await chatHubContext.Clients.Client(connectionId).SendAsync("messageReceived", messageResponse);
+                                await chatHubContext.Clients.Client(connectionId).SendAsync("newConversation", conversation);
                             }
                         }
                     }
@@ -133,19 +134,19 @@ public static class FacebookEndpoints
                             }
 
                             var senderUser = DataManager.Users.Values.FirstOrDefault(x =>
-                                x.FacebookAccountId == messaging.Recipient.Id && x.Type == UserType.Customer &&
+                                x.FacebookAccountId == messaging.Sender.Id && x.Type == UserType.Customer &&
                                 x.UserOwnerId == recipientUser.Id);
                             // create new customer user if not exist
                             if (senderUser is null)
                             {
-                                var recipientFacebookUser =
-                                    await facebookService.GetNode<FacebookAccountResponse>(messaging.Recipient.Id, recipientPage.AccessToken!);
+                                var senderFacebookUser =
+                                    await facebookService.GetNode<FacebookAccountResponse>(messaging.Sender.Id, recipientPage.AccessToken!);
                                 senderUser = new User
                                 {
                                     CreatedAt = DateTimeOffset.Now,
-                                    FacebookAccountId = messaging.Recipient.Id,
+                                    FacebookAccountId = messaging.Sender.Id,
                                     Type = UserType.Customer,
-                                    UserName = recipientFacebookUser.FirstName + " " + recipientFacebookUser.LastName,
+                                    UserName = senderFacebookUser.FirstName + " " + senderFacebookUser.LastName,
                                     UserOwnerId = recipientUser.Id,
                                 };
                                 DataManager.Users[senderUser.Id] = senderUser;
@@ -196,6 +197,7 @@ public static class FacebookEndpoints
                             var connectionId = ChatHub.ConnectionMappings.GetValueOrDefault(recipientUser.Id.ToString());
                             if (connectionId is not null) {
                                 await chatHubContext.Clients.Client(connectionId).SendAsync("messageReceived", messageResponse);
+                                await chatHubContext.Clients.Client(connectionId).SendAsync("newConversation", conversation);
                             }
                         }
                     }

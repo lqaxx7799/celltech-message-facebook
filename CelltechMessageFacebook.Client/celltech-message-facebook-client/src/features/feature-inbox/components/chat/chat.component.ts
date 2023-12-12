@@ -74,6 +74,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (message) => {
           this.messages = [...this.messages, message];
+          this.chatMessage = '';
         },
       });
   }

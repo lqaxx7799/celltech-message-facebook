@@ -1,6 +1,9 @@
 <div class="grid grid-cols-[1fr_6fr]">
-  <div>
-    <div *ngFor="let conversation of conversations">
+  <div class="flex flex-col">
+    <div
+      *ngFor="let conversation of conversations"
+      class="cursor-pointer border-b border-b-gray-200 {{ conversation.id === conversationId ? 'bg-gray-100' : '' }}"
+    >
       <div [routerLink]="['/inbox/' + conversation.id]">
         {{ conversation.id }}
       </div>
