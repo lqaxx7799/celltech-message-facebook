@@ -12,6 +12,14 @@ public static class UserEndpoints
     public static void AddUserEndpoints(this WebApplication app)
     {
         var group = app.MapGroup("user");
+
+        group.MapGet("get", (
+            [FromQuery] Guid id) =>
+        {
+            var user = DataManager.Users.GetValueOrDefault(id);
+            return Results.Ok(user);
+        });
+
         group.MapPost("signUp", async (
             [FromServices] IFacebookService facebookService,
             [FromServices] AppSettings appSettings,

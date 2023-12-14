@@ -113,11 +113,25 @@ public static class FacebookEndpoints
                                 ModifiedBy = message.ModifiedBy,
                                 MessageBlocks = new List<MessageBlock> { messageBlock }
                             };
+
+                            var conversationResponse = new ConversationResponse
+                            {
+                                CreatedAt = conversation.CreatedAt,
+                                CreatedBy = conversation.CreatedBy,
+                                CustomerId = conversation.CustomerId,
+                                FacebookPageId = conversation.FacebookPageId,
+                                ModifiedAt = conversation.ModifiedAt,
+                                Id = conversation.Id,
+                                ModifiedBy = conversation.ModifiedBy,
+                                Customer = DataManager.Users.Values.FirstOrDefault(c => c.Id == conversation.CustomerId && c.Type == UserType.Customer),
+                                LastMessage = messageResponse
+                            };
+
                             // TODO: send signalR
                             var connectionId = ChatHub.ConnectionMappings.GetValueOrDefault(senderUser.Id.ToString());
                             if (connectionId is not null) {
                                 await chatHubContext.Clients.Client(connectionId).SendAsync("messageReceived", messageResponse);
-                                await chatHubContext.Clients.Client(connectionId).SendAsync("newConversation", conversation);
+                                await chatHubContext.Clients.Client(connectionId).SendAsync("newConversation", conversationResponse);
                             }
                         }
                     }
@@ -193,11 +207,24 @@ public static class FacebookEndpoints
                                 MessageBlocks = new List<MessageBlock> { messageBlock }
                             };
 
+                            var conversationResponse = new ConversationResponse
+                            {
+                                CreatedAt = conversation.CreatedAt,
+                                CreatedBy = conversation.CreatedBy,
+                                CustomerId = conversation.CustomerId,
+                                FacebookPageId = conversation.FacebookPageId,
+                                ModifiedAt = conversation.ModifiedAt,
+                                Id = conversation.Id,
+                                ModifiedBy = conversation.ModifiedBy,
+                                Customer = DataManager.Users.Values.FirstOrDefault(c => c.Id == conversation.CustomerId && c.Type == UserType.Customer),
+                                LastMessage = messageResponse
+                            };
+
                             // TODO: send signalR
                             var connectionId = ChatHub.ConnectionMappings.GetValueOrDefault(recipientUser.Id.ToString());
                             if (connectionId is not null) {
                                 await chatHubContext.Clients.Client(connectionId).SendAsync("messageReceived", messageResponse);
-                                await chatHubContext.Clients.Client(connectionId).SendAsync("newConversation", conversation);
+                                await chatHubContext.Clients.Client(connectionId).SendAsync("newConversation", conversationResponse);
                             }
                         }
                     }

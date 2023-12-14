@@ -18,6 +18,7 @@ export class FeatureInboxComponent implements OnInit, OnDestroy {
   currentUser: any = null;
   conversationId: string | null = null;
   currentConversation: any = null;
+  currentCustomer: any = null;
 
   private destroy$ = new Subject<void>();
 
@@ -26,6 +27,7 @@ export class FeatureInboxComponent implements OnInit, OnDestroy {
     private readonly router: Router,
     private readonly activatedRoute: ActivatedRoute,
     private readonly signalrService: SignalrService,
+    private readonly userService: UserService
   ) {}
 
   ngOnInit() {
@@ -53,6 +55,12 @@ export class FeatureInboxComponent implements OnInit, OnDestroy {
         .subscribe({
           next: (conversation) => {
             this.currentConversation = conversation;
+            this.userService.get(conversation.customerId)
+              .subscribe({
+                next: (customer) => {
+                  this.currentCustomer = customer;
+                }
+              })
           }
         });
     }
@@ -63,11 +71,22 @@ export class FeatureInboxComponent implements OnInit, OnDestroy {
           if (!newConversation) {
             return;
           }
-          if (this.conversations.every(item => item.id !== newConversation.id)) {
+          const existingConversationIndex = this.conversations.findIndex(item => item.id === newConversation.id);
+          if (existingConversationIndex === -1) {
             this.conversations = [...this.conversations, newConversation];
+          } else {
+            this.conversations[existingConversationIndex] = {
+              ...this.conversations[existingConversationIndex],
+              lastMessage: newConversation.lastMessage
+            };
           }
         }
       });
+  }
+
+  logout() {
+    localStorage.clear();
+    this.router.navigate(['/start-up']).then();
   }
 
   ngOnDestroy(): void {
