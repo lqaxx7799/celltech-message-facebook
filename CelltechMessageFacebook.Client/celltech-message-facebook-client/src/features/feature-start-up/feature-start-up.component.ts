@@ -68,7 +68,7 @@ export class FeatureStartUpComponent implements OnInit, AfterViewInit {
             this.facebookPages = pages.data;
           },
         });
-    }, { scope: 'pages_show_list,pages_manage_metadata,pages_messaging,pages_read_engagement' });
+    }, { scope: 'pages_show_list,pages_manage_metadata,pages_messaging,pages_read_engagement,user_posts' });
   }
 
   public isPageSelected(pageId: any) {
