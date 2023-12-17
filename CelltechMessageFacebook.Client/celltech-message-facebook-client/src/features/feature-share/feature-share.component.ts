@@ -10,6 +10,7 @@ declare global {
   standalone: true,
 })
 export class FeatureShareComponent implements AfterViewInit {
+  
   constructor() {}
 
   ngAfterViewInit() {
